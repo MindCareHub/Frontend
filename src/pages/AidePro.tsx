@@ -12,78 +12,80 @@ const Professional = () => {
   const clinics = [
     {
       id: 1,
-      name: "Centre MindCare Paris",
+      name: "Centre MindCare Benin",
       type: "Clinique psychiatrique",
-      address: "12 Rue de la Santé, 75014 Paris",
-      phone: "+33 1 45 67 89 00",
-      email: "contact@mindcareparis.fr",
+      address: "Akpakpa, Cotonou, Bénin",
+      phone: "+229 21 30 45 67",
+      email: "mindcarebenin@gmail.com",
       services: ["Consultations", "Urgences", "Hospitalisation"],
       mindcareAccess: true
     },
     {
       id: 2,
-      name: "Clinique du Bien-Être Lyon",
-      type: "Centre de santé mentale",
-      address: "25 Avenue des Lumières, 69003 Lyon",
-      phone: "+33 4 78 90 12 34",
-      email: "info@bienetre-lyon.fr",
-      services: ["Thérapies de groupe", "Suivi individuel", "Ateliers"],
+      name: "Cabinet PsySanté",
+      type: "Cabinet de psychologues",
+      address: "Abomey-Calavi, Bénin",
+      phone: "+229 22 34 56 78",
+      email: "cabinetpysante@gmail.com",
+      services: ["Thérapies individuelles", "Groupes de soutien"],
       mindcareAccess: true
     }
   ];
 
-  const psychologists = [
-    {
-      id: 1,
-      name: "Dr. Sophie Martin",
-      specialty: "Anxiété et dépression",
-      experience: "15 ans d'expérience",
-      location: "Paris 15ème",
-      phone: "+33 1 42 34 56 78",
-      email: "sophie.martin@psy.fr",
-      mindcareAccess: true,
-      price: "60€/séance"
-    },
-    {
-      id: 2,
-      name: "Dr. Pierre Dubois",
-      specialty: "Troubles du comportement",
-      experience: "10 ans d'expérience",
-      location: "Lyon 3ème",
-      phone: "+33 4 72 11 22 33",
-      email: "p.dubois@psy.fr",
-      mindcareAccess: true,
-      price: "50€/séance"
-    },
-    {
-      id: 3,
-      name: "Dr. Amélie Rousseau",
-      specialty: "Thérapie familiale",
-      experience: "12 ans d'expérience",
-      location: "Marseille 8ème",
-      phone: "+33 4 91 44 55 66",
-      email: "a.rousseau@psy.fr",
-      mindcareAccess: false,
-      price: "70€/séance"
-    }
-  ];
+ const psychologists = [
+  {
+    id: 1,
+    name: "Dr. Mireille ADJAHO",
+    specialty: "Gestion du stress et anxiété",
+    experience: "12 ans d'expérience",
+    location: "Cotonou – Fidjrossè",
+    phone: "+229 97 45 23 18",
+    email: "mireille.adjaho@psy-bj.com",
+    mindcareAccess: true,
+    price: "20 000 FCFA / séance"
+  },
+  {
+    id: 2,
+    name: "Dr. Rodrigue HOUNGBÉ",
+    specialty: "Troubles du comportement et thérapie cognitive",
+    experience: "8 ans d'expérience",
+    location: "Porto-Novo – Tokpota",
+    phone: "+229 61 22 47 80",
+    email: "r.houngbe@psy-bj.com",
+    mindcareAccess: true,
+    price: "15 000 FCFA / séance"
+  },
+  {
+    id: 3,
+    name: "Dr. Clarisse AHOUANSOU",
+    specialty: "Thérapie familiale et conjugale",
+    experience: "14 ans d'expérience",
+    location: "Parakou – Zongo",
+    phone: "+229 96 84 50 12",
+    email: "clarisse.ahouansou@psy-bj.com",
+    mindcareAccess: false,
+    price: "25 000 FCFA / séance"
+  }
+];
 
-  const organizations = [
-    {
-      id: 1,
-      name: "I'm The Code",
-      description: "Organisation partenaire proposant des ateliers de développement personnel et des clubs de parole mensuels",
-      services: ["Ateliers hebdomadaires", "Clubs de parole", "Mentorat"],
-      contact: "contact@imthecode.org"
-    },
-    {
-      id: 2,
-      name: "Écoute et Partage",
-      description: "Association d'entraide et de soutien psychologique gratuit pour les personnes en difficulté",
-      services: ["Ligne d'écoute 24/7", "Groupes de soutien", "Accompagnement social"],
-      contact: "aide@ecoutepartage.fr"
-    }
-  ];
+ const organizations = [
+  {
+    id: 1,
+    name: "ONG Racines",
+    description:
+      "Organisation béninoise engagée dans la santé mentale, le développement personnel et l’accompagnement des jeunes.",
+    services: ["Ateliers de développement personnel", "Groupes de parole", "Accompagnement psychologique"],
+    contact: "contact@ongracines.org"
+  },
+  {
+    id: 2,
+    name: "Centre Arc-en-Ciel",
+    description:
+      "Centre d’écoute et de soutien psychosocial offrant une aide gratuite et confidentielle pour les personnes en détresse.",
+    services: ["Ligne d'écoute", "Conseils psychosociaux", "Orientation familiale"],
+    contact: "info@arcenciel-bj.org"
+  }
+];
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">

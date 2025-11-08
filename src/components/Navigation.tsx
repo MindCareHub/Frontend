@@ -22,7 +22,7 @@ const Navigation = () => {
 
   const moreNav = [
     { path: "/evenements", label: "Évènements" },
-    { path: "/aide", label: "Aide" },
+    { path: "/aide", label: "AidePro" },
     { path: "/temoignages", label: "Témoignages" },
   ];
  
