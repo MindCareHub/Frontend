@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,79 +7,75 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Smile, Frown, Meh } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
+import { getJournalEntries, createJournalEntry } from "@/api/journal";
 
 interface JournalEntry {
   id: string;
   date: string;
   content: string;
-  emotion: "joy" | "sadness" | "neutral" | "stress";
+  emotion: string; // maintenant totalement dynamique
 }
 
-const emotionConfig = {
-  joy: { icon: Smile, label: "Joie", color: "bg-secondary text-secondary-foreground" },
-  sadness: { icon: Frown, label: "Tristesse", color: "bg-destructive text-destructive-foreground" },
-  neutral: { icon: Meh, label: "Neutre", color: "bg-muted text-muted-foreground" },
-  stress: { icon: Frown, label: "Stress", color: "bg-accent text-accent-foreground" },
+const emotionConfig: Record<string, { icon: any; color: string }> = {
+  joie: { icon: Smile, color: "bg-secondary text-secondary-foreground" },
+  tristesse: { icon: Frown, color: "bg-destructive text-destructive-foreground" },
+  neutre: { icon: Meh, color: "bg-muted text-muted-foreground" },
+  stress: { icon: Frown, color: "bg-accent text-accent-foreground" },
+  // tu peux rajouter d'autres émotions détectées par l'API ici
 };
 
 const Journal = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([
-    {
-      id: "1",
-      date: "2024-01-15",
-      content: "Aujourd'hui était une belle journée. J'ai passé du temps avec des amis et je me sens vraiment bien.",
-      emotion: "joy",
-    },
-    {
-      id: "2",
-      date: "2024-01-14",
-      content: "Journée difficile au travail. Je me sens un peu dépassé par tout ce que j'ai à faire.",
-      emotion: "stress",
-    },
-  ]);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [newEntry, setNewEntry] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const detectEmotion = (text: string): JournalEntry["emotion"] => {
-    const lowerText = text.toLowerCase();
-    if (lowerText.includes("heureux") || lowerText.includes("belle") || lowerText.includes("bien")) {
-      return "joy";
+  // Charger les entrées depuis l'API
+  const fetchEntries = async () => {
+    try {
+      const data = await getJournalEntries(20, 0); // limit / offset
+      const formattedEntries = data.entries.map((e: any) => ({
+        id: e.id,
+        date: e.created_at || new Date().toISOString(),
+        content: e.entry_text,
+        emotion: e.emotion || "neutre",
+      }));
+      setEntries(formattedEntries);
+    } catch (err) {
+      console.error(err);
     }
-    if (lowerText.includes("triste") || lowerText.includes("mal") || lowerText.includes("difficile")) {
-      return "sadness";
-    }
-    if (lowerText.includes("stress") || lowerText.includes("dépassé") || lowerText.includes("inquiet")) {
-      return "stress";
-    }
-    return "neutral";
   };
 
+  useEffect(() => {
+    fetchEntries();
+  }, []);
+
+  // Création d'une nouvelle entrée
   const handleSubmit = async () => {
     if (!newEntry.trim()) return;
-
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const emotion = detectEmotion(newEntry);
-      const entry: JournalEntry = {
-        id: Date.now().toString(),
-        date: new Date().toISOString().split("T")[0],
-        content: newEntry,
-        emotion,
+    try {
+      const savedEntry = await createJournalEntry(newEntry);
+      const formattedEntry: JournalEntry = {
+        id: savedEntry.id,
+        date: savedEntry.created_at || new Date().toISOString(),
+        content: savedEntry.entry_text,
+        emotion: savedEntry.emotion || "neutre",
       };
-
-      setEntries((prev) => [entry, ...prev]);
+      setEntries((prev) => [formattedEntry, ...prev]);
       setNewEntry("");
-      setIsSubmitting(false);
       toast.success("Entrée de journal enregistrée");
-    }, 500);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container max-w-6xl mx-auto p-4 space-y-6">
         <div className="animate-fade-in">
           <h1 className="text-3xl font-bold mb-2">Journal Émotionnel</h1>
@@ -119,7 +115,9 @@ const Journal = () => {
 
           <div className="grid gap-4">
             {entries.map((entry, index) => {
-              const EmotionIcon = emotionConfig[entry.emotion].icon;
+              const config = emotionConfig[entry.emotion] || { icon: Meh, color: "bg-muted text-muted-foreground" };
+              const EmotionIcon = config.icon;
+
               return (
                 <Card key={entry.id} className="shadow-card animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   <CardHeader>
@@ -135,9 +133,9 @@ const Journal = () => {
                           })}
                         </span>
                       </div>
-                      <Badge className={`${emotionConfig[entry.emotion].color} transition-smooth`}>
+                      <Badge className={`${config.color} transition-smooth`}>
                         <EmotionIcon className="mr-1 h-3 w-3" />
-                        {emotionConfig[entry.emotion].label}
+                        {entry.emotion} {/* Affiche l’émotion telle que renvoyée par l’API */}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -150,9 +148,9 @@ const Journal = () => {
           </div>
         </div>
       </div>
+
       <Footer />
     </div>
-
   );
 };
 

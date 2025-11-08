@@ -6,6 +6,7 @@ import { Send, Bot, User } from "lucide-react";
 import ChatSidebar from "@/components/ui/ChatSidebar";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
+import * as chatbotAPI from "@/api/chatbot";
 
 interface Message {
   id: string;
@@ -32,6 +33,7 @@ const Chatbot = () => {
 
   const activeConversation = conversations.find(c => c.id === activeConversationId);
 
+  // Scroll automatique vers le bas
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -40,20 +42,71 @@ const Chatbot = () => {
     scrollToBottom();
   }, [activeConversation?.messages]);
 
-  const handleNewConversation = () => {
-    const newConversation: Conversation = {
-      id: Date.now().toString(),
-      title: "Nouvelle conversation",
-      timestamp: new Date(),
-      messages: [],
+  // Charger les sessions existantes au montage
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const sessions = await chatbotAPI.getSessions();
+        if (sessions.length === 0) {
+          // 🔹 Crée une session dès le départ si aucune n'existe
+          const newSessionData = await chatbotAPI.startSession("Nouvelle conversation");
+          const newConversation: Conversation = {
+            id: newSessionData.id,
+            title: newSessionData.session_title,
+            timestamp: new Date(newSessionData.created_at),
+            messages: [],
+          };
+          setConversations([newConversation]);
+          setActiveConversationId(newConversation.id);
+        } else {
+          const formatted = sessions.map(s => ({
+            id: s.id,
+            title: s.session_title,
+            timestamp: new Date(s.created_at),
+            messages: s.messages.map((m: any, idx: number) => ({
+              id: idx.toString(),
+              role: m.sender === "user" ? "user" : "assistant",
+              content: m.text,
+              timestamp: new Date(),
+            })),
+          }));
+          setConversations(formatted);
+          setActiveConversationId(formatted[0].id);
+        }
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les sessions.",
+          variant: "destructive",
+        });
+      }
     };
-    setConversations([newConversation, ...conversations]);
-    setActiveConversationId(newConversation.id);
-    setSidebarOpen(false);
-    toast({
-      title: "Nouvelle conversation",
-      description: "Prêt à vous écouter",
-    });
+    loadSessions();
+  }, []);
+
+  const handleNewConversation = async () => {
+    try {
+      const newSessionData = await chatbotAPI.startSession("Nouvelle conversation");
+      const newConversation: Conversation = {
+        id: newSessionData.id,
+        title: newSessionData.session_title,
+        timestamp: new Date(newSessionData.created_at),
+        messages: [],
+      };
+      setConversations([newConversation, ...conversations]);
+      setActiveConversationId(newConversation.id);
+      setSidebarOpen(false);
+      toast({
+        title: "Nouvelle conversation",
+        description: "Prêt à vous écouter",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer une nouvelle session.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSelectConversation = (id: string) => {
@@ -61,72 +114,91 @@ const Chatbot = () => {
     setSidebarOpen(false);
   };
 
-  const handleDeleteConversation = (id: string) => {
-    setConversations(conversations.filter(c => c.id !== id));
-    if (activeConversationId === id) {
-      setActiveConversationId(null);
+  const handleDeleteConversation = async (id: string) => {
+    try {
+      await chatbotAPI.deleteSession(id);
+      setConversations(conversations.filter(c => c.id !== id));
+      if (activeConversationId === id) setActiveConversationId(null);
+      toast({
+        title: "Conversation supprimée",
+        variant: "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la session.",
+        variant: "destructive",
+      });
     }
-    toast({
-      title: "Conversation supprimée",
-      variant: "destructive",
-    });
   };
 
+  // 🔹 Nouvelle version améliorée
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
-    let currentConversation = activeConversation;
-
-    // Create new conversation if none exists
-    if (!currentConversation) {
-      const newConversation: Conversation = {
-        id: Date.now().toString(),
-        title: input.slice(0, 30) + (input.length > 30 ? "..." : ""),
-        timestamp: new Date(),
-        messages: [],
-      };
-      setConversations([newConversation, ...conversations]);
-      setActiveConversationId(newConversation.id);
-      currentConversation = newConversation;
-    }
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-      timestamp: new Date(),
-    };
-
-    // Update conversation with user message
-    setConversations(prev =>
-      prev.map(c =>
-        c.id === currentConversation.id
-          ? { ...c, messages: [...c.messages, userMessage] }
-          : c
-      )
-    );
-
-    setInput("");
     setIsLoading(true);
+    let conversationId = activeConversationId;
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: `Je vous comprends. Merci de partager vos sentiments avec moi. Comment puis-je vous aider aujourd'hui ? Je suis là pour vous écouter et vous accompagner dans votre parcours de bien-être.`,
+    try {
+      // Si aucune conversation active, on en crée une immédiatement
+      if (!conversationId) {
+        const newSessionData = await chatbotAPI.startSession("Nouvelle conversation");
+        const newConversation: Conversation = {
+          id: newSessionData.id,
+          title: newSessionData.session_title,
+          timestamp: new Date(newSessionData.created_at),
+          messages: [],
+        };
+        setConversations(prev => [newConversation, ...prev]);
+        setActiveConversationId(newConversation.id);
+        conversationId = newConversation.id;
+      }
+
+      // Message utilisateur
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: "user",
+        content: input,
         timestamp: new Date(),
       };
 
       setConversations(prev =>
         prev.map(c =>
-          c.id === currentConversation.id
+          c.id === conversationId
+            ? { ...c, messages: [...c.messages, userMessage] }
+            : c
+        )
+      );
+
+      setInput("");
+
+      // Envoie au backend
+      const res = await chatbotAPI.sendMessage(conversationId, userMessage.content);
+
+      // Message du bot
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: res.session.messages[res.session.messages.length - 1].text,
+        timestamp: new Date(),
+      };
+
+      setConversations(prev =>
+        prev.map(c =>
+          c.id === conversationId
             ? { ...c, messages: [...c.messages, botMessage] }
             : c
         )
       );
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer le message au bot.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -138,8 +210,7 @@ const Chatbot = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-  {/* Navbar en haut */}
-  <Navigation />
+      <Navigation />
 
       <ChatSidebar
         conversations={conversations}
@@ -151,9 +222,7 @@ const Chatbot = () => {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      {/* Main Chat Area */}
       <main className="flex-1 flex flex-col md:ml-64">
-        {/* Chat Header */}
         <header className="border-b border-border p-4 bg-card">
           <div className="container max-w-4xl mx-auto">
             <h1 className="text-xl font-semibold flex items-center gap-2">
@@ -166,7 +235,6 @@ const Chatbot = () => {
           </div>
         </header>
 
-        {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4">
           <div className="container max-w-4xl mx-auto space-y-4">
             {!activeConversation || activeConversation.messages.length === 0 ? (
@@ -246,7 +314,6 @@ const Chatbot = () => {
           </div>
         </div>
 
-        {/* Input Area */}
         <div className="border-t border-border p-4 bg-card">
           <div className="container max-w-4xl mx-auto">
             <div className="flex gap-2">

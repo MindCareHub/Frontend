@@ -25,11 +25,13 @@ const Navigation = () => {
     { path: "/aide", label: "Aide" },
     { path: "/temoignages", label: "Témoignages" },
   ];
+ 
+
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white dark:bg-black text-black dark:text-white backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="container flex h-16 items-center justify-between">
-        
+
         {/* LOGO */}
         <Link to="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-full gradient-calm" />
