@@ -156,3 +156,178 @@ All colors MUST be HSL.
     transition: var(--transition-smooth);
   }
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- MindCare Hub - Green Calming Palette --- */
+/* Toute la palette bleue a été remplacée par une palette verte dominante */
+
+@layer base {
+  :root {
+    /* Backgrounds */
+    --background: 140 25% 98%;
+    --foreground: 140 20% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 140 20% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 140 20% 20%;
+
+    /* ✅ Primary = Vert lumineux calme */
+    --primary: 140 60% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 140 45% 85%;
+
+    /* ✅ Secondary = Vert mint */
+    --secondary: 130 45% 70%;
+    --secondary-foreground: 140 20% 20%;
+    --secondary-soft: 130 40% 90%;
+
+    /* ✅ Muted */
+    --muted: 140 20% 95%;
+    --muted-foreground: 140 15% 40%;
+
+    /* ✅ Accent = Vert turquoise */
+    --accent: 155 60% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* ✅ Other */
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 140 20% 88%;
+    --input: 140 20% 92%;
+    --ring: 140 60% 50%;
+
+    --radius: 1rem;
+
+    /* ✅ Gradients */
+    --gradient-calm: linear-gradient(
+      135deg,
+      hsl(140, 60%, 50%),
+      hsl(130, 45%, 70%)
+    );
+
+    --gradient-soft: linear-gradient(
+      180deg,
+      hsl(140, 25%, 98%),
+      hsl(140, 30%, 96%)
+    );
+
+    /* ✅ Shadows */
+    --shadow-gentle: 0 4px 16px -4px hsl(140 40% 40% / 0.15);
+    --shadow-card: 0 2px 12px -2px hsl(140 30% 40% / 0.12);
+
+    /* ✅ Sidebar */
+    --sidebar-background: 140 10% 98%;
+    --sidebar-foreground: 140 10% 20%;
+
+    --sidebar-primary: 140 55% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    --sidebar-accent: 140 10% 95%;
+    --sidebar-accent-foreground: 140 10% 20%;
+
+    --sidebar-border: 140 10% 90%;
+    --sidebar-ring: 150 60% 55%;
+  }
+
+  /* 🌙 DARK MODE */
+  .dark {
+    --background: 140 10% 12%;
+    --foreground: 140 10% 95%;
+
+    --card: 140 10% 17%;
+    --card-foreground: 140 10% 95%;
+
+    --popover: 140 10% 17%;
+    --popover-foreground: 140 10% 95%;
+
+    --primary: 140 55% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 140 25% 30%;
+
+    --secondary: 130 40% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-soft: 130 25% 25%;
+
+    --muted: 140 10% 20%;
+    --muted-foreground: 140 10% 65%;
+
+    --accent: 155 55% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 140 10% 25%;
+    --input: 140 10% 22%;
+    --ring: 140 55% 55%;
+
+    --gradient-calm: linear-gradient(
+      135deg,
+      hsl(140, 55%, 45%),
+      hsl(130, 45%, 40%)
+    );
+
+    --gradient-soft: linear-gradient(
+      180deg,
+      hsl(140, 10%, 12%),
+      hsl(140, 10%, 15%)
+    );
+
+    --shadow-gentle: 0 4px 16px -4px hsl(140 40% 30% / 0.3);
+    --shadow-card: 0 2px 12px -2px hsl(140 30% 20% / 0.4);
+
+    --sidebar-background: 140 10% 10%;
+    --sidebar-foreground: 140 10% 96%;
+
+    --sidebar-primary: 140 55% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    --sidebar-accent: 140 10% 15%;
+    --sidebar-accent-foreground: 140 10% 95%;
+
+    --sidebar-border: 140 10% 15%;
+    --sidebar-ring: 150 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+
+@layer utilities {
+  .gradient-calm {
+    background: var(--gradient-calm);
+  }
+
+  .gradient-soft {
+    background: var(--gradient-soft);
+  }
+
+  .shadow-gentle {
+    box-shadow: var(--shadow-gentle);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
