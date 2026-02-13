@@ -47,11 +47,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4" />
-                <span>+33 1 23 45 67 89</span>
+                <span>+229 01 57 51 23 06</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                <span>Paris, France</span>
+                <span>Benin , Cotonou</span>
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@ const Footer = () => {
         {/* Bottom section */}
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm ">
-            <p>© 2024 MindCare Hub. Tous droits réservés.</p>
+            <p>© 2025 MindCare Hub. Tous droits réservés.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-primary transition-colors">
                 Mentions légales
